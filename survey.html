@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Survey Perawatan - Farah Mom & Baby Care</title>
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(to bottom right, #fdf2f8, #e9d5ff, #dbeafe);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      .survey-card {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+      }
+      .section-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #a855f7;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #ec4899;
+      }
+      .note {
+        background: #f3e8ff;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.9rem;
+        color: #444;
+      }
+      .form-check-input:checked {
+        background-color: #ec4899;
+        border-color: #ec4899;
+      }
+      .form-check-label {
+        cursor: pointer;
+      }
+      .btn-next {
+        background: linear-gradient(to right, #ec4899, #a855f7);
+        border: none;
+      }
+      .btn-next:hover {
+        background: linear-gradient(to right, #db2777, #9333ea);
+      }
+      .summary-item {
+        background: #fcf4ff;
+        border-left: 4px solid #ec4899;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="survey-card mx-auto" style="max-width: 800px" id="app"></div>
+    </div>
+
+    <script>
+      const questions = [
+        // Bagian 1 - Identitas Dasar (selalu muncul)
+        {
+          id: "receiver",
+          section: "BAGIAN 1 — IDENTITAS DASAR",
+          question: "Siapa yang akan menerima perawatan?",
+          type: "radio", // multiple karena bisa ibu hamil sekaligus menyusui, dll.
+          options: [
+            { value: "pregnant", label: "Ibu hamil" },
+            { value: "postpartum", label: "Ibu pasca melahirkan" },
+            { value: "breastfeeding", label: "Ibu menyusui" },
+            { value: "baby", label: "Bayi (0–12 bulan)" },
+            { value: "child", label: "Anak (1–10 tahun)" },
+          ],
+        },
+
+        {
+          id: "gender",
+          question: "Jenis Kelamin (jika untuk bayi/anak):",
+          type: "single",
+          showIf: (ans) =>
+            ans.receiver?.includes("baby") || ans.receiver?.includes("child"),
+          options: [
+            { value: "male", label: "Laki-laki" },
+            { value: "female", label: "Perempuan" },
+          ],
+        },
+        {
+          id: "location",
+          question: "Lokasi perawatan:",
+          type: "single",
+          options: [
+            { value: "clinic", label: "Klinik Farah Mom & Baby Care" },
+            { value: "home", label: "Homecare (di rumah)" },
+          ],
+        },
+        {
+          id: "firstVisit",
+          question: "Apakah ini kunjungan pertama ke Farah Mom & Baby Care?",
+          type: "single",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+
+        // Bagian 2 - Kondisi Umum (selalu muncul)
+        {
+          id: "generalCondition",
+          section: "BAGIAN 2 — KONDISI UMUM",
+          question: "Kondisi umum penerima treatment saat ini:",
+          type: "single",
+          options: [
+            { value: "healthy", label: "Sehat" },
+            { value: "tired", label: "Kurang fit / mudah lelah" },
+            {
+              value: "complaint",
+              label: "Ada keluhan tertentu (jelaskan di bawah)",
+            },
+          ],
+        },
+        {
+          id: "complaintDetail",
+          question: "Jelaskan keluhan tertentu:",
+          type: "textarea",
+          showIf: (ans) => ans.generalCondition === "complaint",
+        },
+        {
+          id: "fever",
+          question:
+            "Apakah sedang mengalami demam (suhu tubuh di atas 37,5°C)?",
+          type: "single",
+          note: "Jika bayi/anak: massage akan ditunda hingga suhu normal.<br>Jika ibu menyusui: tetap dapat dilakukan (terutama jika karena payudara bengkak).<br>Jika ibu hamil: disarankan menunda hingga stabil.",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "medication",
+          question: "Apakah sedang mengonsumsi obat atau suplemen tertentu?",
+          type: "single",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "medicationDetail",
+          question: "Sebutkan obat/suplemen:",
+          type: "textarea",
+          showIf: (ans) => ans.medication === "yes",
+        },
+        {
+          id: "allergy",
+          question:
+            "Apakah memiliki alergi terhadap minyak pijat, essential oil, atau bahan herbal tertentu?",
+          type: "single",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "allergyDetail",
+          question: "Jelaskan alergi:",
+          type: "textarea",
+          showIf: (ans) => ans.allergy === "yes",
+        },
+
+        // Bagian 3A - Ibu Hamil (kondisional)
+        {
+          id: "pregnantWeek",
+          section: "BAGIAN 3A — IBU HAMIL",
+          question: "Usia kehamilan saat ini:",
+          type: "text",
+          showIf: (ans) => ans.receiver?.includes("pregnant"),
+          placeholder: "contoh: “28 minggu” atau '3 bulan'",
+        },
+        {
+          id: "pregnantComplaints",
+          question: "Keluhan yang dirasakan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("pregnant"),
+          options: [
+            { value: "backPain", label: "Pegal punggung / pinggang" },
+            { value: "swollenLegs", label: "Kaki bengkak / kram" },
+            { value: "insomnia", label: "Sulit tidur" },
+            { value: "shoulderPain", label: "Nyeri di bahu / leher" },
+            {
+              value: "relaxBonding",
+              label: "Ingin relaksasi dan bonding dengan janin",
+            },
+            { value: "other", label: "Lainnya" },
+          ],
+        },
+        {
+          id: "pregnantOther",
+          question: "Keluhan lainnya:",
+          type: "textarea",
+          showIf: (ans) => ans.pregnantComplaints?.includes("other"),
+        },
+        {
+          id: "pregnantGoal",
+          question: "Tujuan utama perawatan:",
+          type: "single",
+          showIf: (ans) => ans.receiver?.includes("pregnant"),
+          options: [
+            {
+              value: "relax",
+              label: "Relaksasi & mengurangi keluhan kehamilan",
+            },
+            {
+              value: "birthPrep",
+              label:
+                "Persiapan melahirkan (Pijat Gelombang Cinta / Induksi Alami / Prenatal Gentle Yoga / Senam Hamil)",
+            },
+            {
+              value: "beauty",
+              label:
+                "Perawatan kecantikan & relaksasi (Lulur, Totok, Masker, Foot Spa)",
+            },
+            {
+              value: "complete",
+              label:
+                "Perawatan lengkap (Massage + Totok + Body Scrub + Foot Spa)",
+            },
+          ],
+        },
+
+        // Bagian 3B - Ibu Pasca / Menyusui (kondisional)
+        {
+          id: "momDuration",
+          section: "BAGIAN 3B — IBU PASCA MELAHIRKAN / MENYUSUI",
+          question: "Sudah berapa lama pasca melahirkan?",
+          type: "text",
+          showIf: (ans) =>
+            ans.receiver?.includes("postpartum") ||
+            ans.receiver?.includes("breastfeeding"),
+          placeholder: "contoh: “3 minggu” atau “4 bulan”",
+        },
+        {
+          id: "birthType",
+          question: "Jenis persalinan:",
+          type: "single",
+          showIf: (ans) =>
+            ans.receiver?.includes("postpartum") ||
+            ans.receiver?.includes("breastfeeding"),
+          options: [
+            { value: "normal", label: "Normal" },
+            { value: "caesar", label: "Caesar" },
+          ],
+        },
+        {
+          id: "activeBF",
+          question: "Apakah sedang menyusui aktif?",
+          type: "single",
+          showIf: (ans) =>
+            ans.receiver?.includes("postpartum") ||
+            ans.receiver?.includes("breastfeeding"),
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "momComplaints",
+          question: "Keluhan utama:",
+          type: "multiple",
+          showIf: (ans) =>
+            ans.receiver?.includes("postpartum") ||
+            ans.receiver?.includes("breastfeeding"),
+          options: [
+            { value: "bodyPain", label: "Badan pegal / nyeri punggung" },
+            { value: "lowMilk", label: "Produksi ASI menurun" },
+            {
+              value: "swollenBreast",
+              label: "Payudara bengkak / terasa keras",
+            },
+            {
+              value: "bigBelly",
+              label: "Perut masih membesar / ingin perawatan perut",
+            },
+            { value: "dullFace", label: "Wajah kusam / ingin relaksasi" },
+            { value: "other", label: "Lainnya" },
+          ],
+        },
+        {
+          id: "momOther",
+          question: "Keluhan lainnya:",
+          type: "textarea",
+          showIf: (ans) => ans.momComplaints?.includes("other"),
+        },
+        {
+          id: "momGoal",
+          question: "Tujuan utama perawatan:",
+          type: "multiple",
+          showIf: (ans) =>
+            ans.receiver?.includes("postpartum") ||
+            ans.receiver?.includes("breastfeeding"),
+          options: [
+            { value: "relaxRecovery", label: "Relaksasi & pemulihan tubuh" },
+            { value: "boostMilk", label: "Melancarkan ASI" },
+            { value: "faceBody", label: "Perawatan wajah & tubuh" },
+            {
+              value: "complete",
+              label:
+                "Perawatan lengkap (Nifas + Laktasi + Totok & Masker Wajah)",
+            },
+            {
+              value: "bundle",
+              label: "Paket harian ibu & bayi (Blissful Beginning Bundle)",
+            },
+          ],
+        },
+
+        // Bagian 3C - Bayi (kondisional)
+        {
+          id: "babyAge",
+          section: "BAGIAN 3C — BAYI (0–12 BULAN)",
+          question: "Usia bayi:",
+          type: "text",
+          showIf: (ans) => ans.receiver?.includes("baby"),
+          placeholder: "contoh: “3 bulan”",
+        },
+        {
+          id: "babyCondition",
+          question: "Kondisi bayi:",
+          type: "single",
+          showIf: (ans) => ans.receiver?.includes("baby"),
+          options: [
+            { value: "healthy", label: "Sehat & ceria" },
+            { value: "unwell", label: "Kurang sehat / rewel" },
+            { value: "fever", label: "Demam (>37,5°C) → Massage akan ditunda" },
+          ],
+        },
+        {
+          id: "babyComplaints",
+          question: "Keluhan bayi:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("baby"),
+          options: [
+            { value: "colic", label: "Kolik / perut kembung" },
+            { value: "cold", label: "Batuk pilek ringan" },
+            { value: "sleep", label: "Sulit tidur / rewel" },
+            { value: "constipation", label: "Susah BAB / konstipasi" },
+            { value: "appetite", label: "Nafsu makan menurun" },
+            {
+              value: "none",
+              label:
+                "Tidak ada keluhan (untuk pijat rutin / stimulasi tumbuh kembang)",
+            },
+          ],
+        },
+        {
+          id: "babyGoal",
+          question: "Tujuan perawatan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("baby"),
+          options: [
+            { value: "massage", label: "Pijat relaksasi & tumbuh kembang" },
+            {
+              value: "fullPackage",
+              label: "Paket lengkap (Massage + Gym + Swim)",
+            },
+            {
+              value: "skinCare",
+              label: "Perawatan kulit & sensorik (Body Mask / Glow Up)",
+            },
+          ],
+        },
+        {
+          id: "babyAdditional",
+          question: "Tambahan layanan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("baby"),
+          options: [
+            { value: "earPiercing", label: "Tindik telinga" },
+            { value: "haircut", label: "Cukur rambut botak/gundul" },
+          ],
+        },
+
+        // Bagian 3D - Anak (kondisional)
+        {
+          id: "childAge",
+          section: "BAGIAN 3D — ANAK (1–10 TAHUN)",
+          question: "Usia anak:",
+          type: "text",
+          showIf: (ans) => ans.receiver?.includes("child"),
+          placeholder: "contoh: “6 tahun”",
+        },
+        {
+          id: "childCondition",
+          question: "Kondisi anak:",
+          type: "single",
+          showIf: (ans) => ans.receiver?.includes("child"),
+          options: [
+            { value: "healthy", label: "Sehat & aktif" },
+            { value: "unwell", label: "Kurang fit" },
+            { value: "fever", label: "Demam (>37,5°C) → Massage akan ditunda" },
+          ],
+        },
+        {
+          id: "childGoal",
+          question: "Tujuan perawatan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("child"),
+          options: [
+            { value: "relax", label: "Relaksasi & kenyamanan tubuh" },
+            {
+              value: "treatMinor",
+              label: "Mengatasi keluhan ringan (flu, perut kembung, dll.)",
+            },
+            { value: "growth", label: "Stimulasi tumbuh kembang" },
+            {
+              value: "skinCare",
+              label: "Perawatan kulit & sensorik (Body Mask / Glow Up)",
+            },
+          ],
+        },
+        {
+          id: "childAdditional",
+          question: "Tambahan layanan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver?.includes("child"),
+          options: [
+            { value: "earPiercing", label: "Tindik telinga" },
+            { value: "haircut", label: "Cukur rambut botak/gundul" },
+          ],
+        },
+
+        // Bagian 4 - Preferensi & Penjadwalan (selalu terakhir)
+        {
+          id: "therapist",
+          section: "BAGIAN 4 — PREFERENSI & PENJADWALAN",
+          question: "Pilih therapist:",
+          type: "single",
+          options: [
+            { value: "professional", label: "Professional Therapist" },
+            { value: "special", label: "Special Therapist (Bidan)" },
+            { value: "head", label: "Head Therapist (Bidan Farah / Owner)" },
+          ],
+        },
+        {
+          id: "schedule",
+          question: "Waktu treatment yang diinginkan:",
+          type: "datetime",
+          note: "Pilih tanggal dan jam yang diinginkan",
+        },
+        {
+          id: "notes",
+          question: "Catatan tambahan dari bunda/ayah:",
+          type: "textarea",
+        },
+      ];
+
+      let step = 0;
+      let answers = {};
+      let showSummary = false;
+
+      const app = document.getElementById("app");
+
+      function getVisibleQuestions() {
+        return questions.filter((q) => !q.showIf || q.showIf(answers));
+      }
+
+      function handleAnswer(id, value, isMultiple = false) {
+        if (isMultiple) {
+          const current = answers[id] || [];
+          if (current.includes(value)) {
+            answers[id] = current.filter((v) => v !== value);
+          } else {
+            answers[id] = [...current, value];
+          }
+        } else {
+          answers[id] = value;
+          setTimeout(() => {
+            const visible = getVisibleQuestions();
+            if (step < visible.length - 1) {
+              step++;
+              render();
+            }
+          }, 300);
+        }
+        render();
+      }
+
+      function handleText(id, value) {
+        answers[id] = value;
+        render();
+      }
+
+      function nextStep() {
+        const visible = getVisibleQuestions();
+        if (step < visible.length - 1) {
+          step++;
+        } else {
+          showSummary = true;
+        }
+        render();
+      }
+
+      function prevStep() {
+        if (step > 0) step--;
+        render();
+      }
+
+      function reset() {
+        step = 0;
+        answers = {};
+        showSummary = false;
+        render();
+      }
+
+      function getLabel(id, value) {
+        const q = questions.find((qq) => qq.id === id);
+        if (!q || !q.options) return value || "-";
+        if (Array.isArray(value)) {
+          return value
+            .map((v) => q.options.find((o) => o.value === v)?.label || v)
+            .join(", ");
+        }
+        return q.options.find((o) => o.value === value)?.label || value || "-";
+      }
+
+      function copySummary() {
+        let text = "Ringkasan Survey - Farah Mom & Baby Care\n";
+        text += "Tanggal: " + new Date().toLocaleDateString("id-ID") + "\n\n";
+
+        let currentSection = "";
+        questions.forEach((q) => {
+          if (q.showIf && !q.showIf(answers)) return;
+          if (!answers[q.id]) return;
+
+          if (q.section && q.section !== currentSection) {
+            currentSection = q.section;
+            text += currentSection + "\n";
+          }
+
+          const displayValue = getLabel(q.id, answers[q.id]);
+          text += q.question + "\n";
+          text += displayValue + "\n\n";
+        });
+
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert("Ringkasan berhasil disalin ke clipboard!");
+          })
+          .catch(() => {
+            alert("Gagal copy otomatis. Silakan select manual dan copy.");
+          });
+      }
+
+      function renderSummary() {
+        let currentSection = "";
+        let html = `
+      <div class="text-center mb-5">
+        <h2 class="display-6">Terima Kasih!</h2>
+        <p class="lead text-muted">Survey Anda telah selesai. Berikut ringkasan jawaban Anda.</p>
+        <div class="d-flex justify-content-center gap-3 mb-4">
+          <button class="btn btn-outline-success px-4" onclick="copySummary()">
+            📋 Copy Ringkasan
+          </button>
+        </div>
+      </div>
+      <div class="row">`;
+
+        questions.forEach((q) => {
+          if (q.showIf && !q.showIf(answers)) return;
+          if (!answers[q.id]) return;
+
+          if (q.section && q.section !== currentSection) {
+            currentSection = q.section;
+            html += `</div><div class="section-title mt-5">${currentSection}</div><div class="row">`;
+          }
+
+          const value = answers[q.id];
+          const displayValue = getLabel(q.id, value);
+
+          html += `
+        <div class="col-12 mb-3">
+          <div class="p-3 rounded summary-item">
+            <strong>${q.question}</strong><br>
+            <span class="text-muted">${displayValue}</span>
+          </div>
+        </div>`;
+        });
+
+        html += `</div>
+      <div class="mt-5">
+        <button class="btn btn-primary btn-lg w-100 btn-next" onclick="reset()">Isi Survey Baru</button>
+      </div>`;
+
+        app.innerHTML = html;
+      }
+
+      function render() {
+        if (showSummary) {
+          renderSummary();
+          return;
+        }
+
+        const visible = getVisibleQuestions();
+        const current = visible[step];
+
+        if (!current) {
+          app.innerHTML = "";
+          return;
+        }
+
+        const isAnswered = (() => {
+          if (!answers[current.id]) return false;
+          if (current.type === "multiple")
+            return answers[current.id].length > 0;
+          if (current.type === "single") return true;
+          if (
+            current.type === "text" ||
+            current.type === "textarea" ||
+            current.type === "datetime"
+          )
+            return answers[current.id].trim().length > 0;
+          return false;
+        })();
+
+        let sectionHtml = "";
+        if (
+          current.section &&
+          (step === 0 || visible[step - 1]?.section !== current.section)
+        ) {
+          sectionHtml = `<div class="section-title">${current.section}</div>`;
+        }
+
+        let optionsHtml = "";
+        if (current.options) {
+          const inputType = current.type === "multiple" ? "checkbox" : "radio";
+          const name = current.id;
+          optionsHtml = current.options
+            .map((opt) => {
+              const selected =
+                current.type === "multiple"
+                  ? (answers[current.id] || []).includes(opt.value)
+                  : answers[current.id] === opt.value;
+              return `
+                <div class="form-check">
+                  <input class="form-check-input" type="${inputType}" name="${name}" id="${
+                opt.value
+              }" value="${opt.value}"
+                         ${selected ? "checked" : ""} onchange="handleAnswer('${
+                current.id
+              }', '${opt.value}', ${current.type === "multiple"})">
+                  <label class="form-check-label fw-medium" for="${opt.value}">
+                    ${opt.label}
+                  </label>
+                </div>`;
+            })
+            .join("");
+        }
+
+        let inputHtml = "";
+        if (current.type === "text") {
+          inputHtml = `<input type="text" class="form-control mt-3" placeholder="${
+            current.placeholder || ""
+          }" value="${answers[current.id] || ""}" oninput="handleText('${
+            current.id
+          }', this.value)">`;
+        } else if (current.type === "textarea") {
+          inputHtml = `<textarea class="form-control mt-3" rows="4" placeholder="${
+            current.placeholder || ""
+          }" oninput="handleText('${current.id}', this.value)">${
+            answers[current.id] || ""
+          }</textarea>`;
+        } else if (current.type === "datetime") {
+          // Format value ke YYYY-MM-DDThh:mm agar date picker bisa tampilkan nilai sebelumnya
+          let formattedValue = answers[current.id] || "";
+          inputHtml = `<input type="datetime-local" class="form-control mt-3" value="${formattedValue}" onchange="handleText('${current.id}', this.value)">`;
+        }
+
+        app.innerHTML = `
+      ${sectionHtml}
+      <div class="mb-4">
+        <small class="text-muted">Pertanyaan ${step + 1} dari ${
+          visible.length
+        }</small>
+        <div class="progress mt-2" style="height: 8px;">
+          <div class="progress-bar bg-pink" role="progressbar" style="width: ${
+            ((step + 1) / visible.length) * 100
+          }%; background: linear-gradient(to right, #ec4899, #a855f7)!important;"></div>
+        </div>
+      </div>
+      <h4 class="mb-4">${current.question}</h4>
+      ${
+        current.note
+          ? `<div class="note mb-4">${current.note.replace(
+              /\n/g,
+              "<br>"
+            )}</div>`
+          : ""
+      }
+      ${
+        current.type === "multiple"
+          ? '<small class="text-muted d-block mb-3">Pilih satu atau lebih</small>'
+          : ""
+      }
+      ${optionsHtml}
+      ${inputHtml}
+      <div class="d-flex gap-3 mt-5">
+        ${
+          step > 0
+            ? `<button class="btn btn-outline-secondary px-4" onclick="prevStep()">Kembali</button>`
+            : ""
+        }
+        <button class="btn btn-primary px-5 flex-grow-1 btn-next" ${
+          !isAnswered ? "disabled" : ""
+        } onclick="nextStep()">
+          ${
+            step === visible.length - 1 ? "Selesai & Lihat Ringkasan" : "Lanjut"
+          }
+        </button>
+      </div>
+    `;
+
+        if (current.type === "text" || current.type === "textarea") {
+          const input = app.querySelector(
+            "input.form-control, textarea.form-control"
+          );
+          if (input) {
+            input.focus();
+            input.selectionStart = input.selectionEnd = input.value.length;
+          }
+        }
+      }
+
+      render();
+    </script>
+  </body>
+</html>
