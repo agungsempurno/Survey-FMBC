@@ -81,7 +81,7 @@
         },
         {
           id: "gender",
-          question: "Jenis Kelamin (jika untuk bayi/anak):",
+          question: "Jenis Kelamin:",
           type: "single",
           showIf: (ans) => ans.receiver === "baby" || ans.receiver === "child",
           options: [
@@ -100,7 +100,7 @@
         },
         {
           id: "firstVisit",
-          question: "Apakah ini kunjungan pertama ke Farah Mom & Baby Care?",
+          question: "Apakah ini layanan pertama dari Farah Mom & Baby Care?",
           type: "single",
           options: [
             { value: "yes", label: "Ya" },
@@ -109,7 +109,7 @@
         },
         {
           id: "generalCondition",
-          section: "BAGIAN 2 — KONDISI UMUM",
+          section: "KONDISI UMUM",
           question: "Kondisi umum penerima treatment saat ini:",
           type: "single",
           options: [
@@ -170,7 +170,7 @@
         },
         {
           id: "pregnantWeek",
-          section: "BAGIAN 3A — IBU HAMIL",
+          section: "IBU HAMIL",
           question: "Usia kehamilan saat ini:",
           type: "text",
           showIf: (ans) => ans.receiver === "pregnant",
@@ -200,8 +200,18 @@
           showIf: (ans) => ans.pregnantComplaints?.includes("other"),
         },
         {
+          id: "pregnantAdditional",
+          question: "Layanan tambahan yang diinginkan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver === "pregnant",
+          options: [
+            { value: "totokScrub", label: "Totok Wajah & Body Scrub" },
+            { value: "none", label: "Tidak ada" },
+          ],
+        },
+        {
           id: "momDuration",
-          section: "BAGIAN 3B — IBU PASCA MELAHIRKAN / MENYUSUI",
+          section: "IBU PASCA MELAHIRKAN / MENYUSUI",
           question: "Sudah berapa lama pasca melahirkan?",
           type: "text",
           showIf: (ans) => ans.receiver === "postpartum",
@@ -254,6 +264,17 @@
           showIf: (ans) => ans.momComplaints?.includes("other"),
         },
         {
+          id: "momAdditional",
+          question: "Layanan tambahan yang diinginkan:",
+          type: "multiple",
+          showIf: (ans) => ans.receiver === "postpartum",
+          options: [
+            { value: "totokMasker", label: "Totok Wajah & Masker Wajah" },
+            { value: "bodyScrub", label: "Body Scrub" },
+            { value: "none", label: "Tidak ada" },
+          ],
+        },
+        {
           id: "babyAge",
           section: "BAYI (0–12 BULAN)",
           question: "Usia bayi:",
@@ -263,7 +284,7 @@
         },
         {
           id: "babyCondition",
-          question: "Kondisi bayi:",
+          question: "Kondisi bayi saat ini:",
           type: "single",
           showIf: (ans) => ans.receiver === "baby",
           options: [
@@ -291,13 +312,15 @@
         },
         {
           id: "babyAdditional",
-          question: "Tambahan layanan:",
+          question: "Layanan tambahan yang diinginkan:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "baby",
           options: [
-            { value: "earPiercing", label: "Tindik telinga" },
-            { value: "haircut", label: "Cukur rambut botak/gundul" },
-            { value: "tidak", label: "tidak ada" },
+            { value: "earPiercing", label: "Tindik Telinga" },
+            { value: "haircut", label: "Cukur Rambut Botak/Gundul (Hair Cut)" },
+            { value: "bubble", label: "Bubble Bath" },
+            { value: "mask", label: "Body Mask" },
+            { value: "none", label: "Tidak ada" },
           ],
         },
         {
@@ -309,29 +332,37 @@
           placeholder: "contoh: “6 tahun”",
         },
         {
-          id: "childCondition",
-          question: "Kondisi anak:",
-          type: "single",
+          id: "childComplaints",
+          question: "Keluhan anak:",
+          type: "multiple",
           showIf: (ans) => ans.receiver === "child",
           options: [
-            { value: "healthy", label: "Sehat & aktif" },
-            { value: "unwell", label: "Kurang fit" },
+            { value: "cold", label: "Batuk pilek ringan" },
+            { value: "sleep", label: "Sulit tidur / rewel malam" },
+            { value: "constipation", label: "Susah BAB / konstipasi" },
+            { value: "appetite", label: "Nafsu makan menurun" },
+            { value: "tired", label: "Mudah lelah / kurang energi" },
+            {
+              value: "none",
+              label: "Tidak ada keluhan (untuk pijat rutin & relaksasi)",
+            },
           ],
         },
         {
           id: "childAdditional",
-          question: "Tambahan layanan:",
+          question: "Layanan tambahan yang diinginkan:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "child",
           options: [
-            { value: "earPiercing", label: "Tindik telinga" },
-            { value: "haircut", label: "Cukur rambut botak/gundul" },
-            { value: "tidak", label: "Tidak ada" },
+            { value: "earPiercing", label: "Tindik Telinga" },
+            { value: "bubble", label: "Bubble Bath" },
+            { value: "mask", label: "Body Mask" },
+            { value: "none", label: "Tidak ada" },
           ],
         },
         {
           id: "therapist",
-          section: "BAGIAN 4 — PREFERENSI & PENJADWALAN",
+          section: "PREFERENSI & PENJADWALAN",
           question: "Pilih therapist:",
           type: "single",
           options: [
@@ -456,98 +487,155 @@
         }
 
         if (ans.receiver === "pregnant") {
-          let fokus = [];
           const complaints = ans.pregnantComplaints || [];
+          let fokus = [];
           if (
             complaints.includes("backPain") ||
             complaints.includes("shoulderPain")
-          )
-            fokus.push("pegal punggung/pinggang/bahu/leher");
-          if (complaints.includes("swollenLegs"))
-            fokus.push("kaki bengkak/kram");
-          if (
-            complaints.includes("insomnia") ||
-            complaints.includes("relaxBonding")
-          )
-            fokus.push("relaksasi & bonding janin");
+          ) {
+            fokus.push("nyeri punggung, pinggang, bahu & leher");
+          }
+          if (complaints.includes("swollenLegs")) {
+            fokus.push("kaki bengkak & kram");
+          }
+          if (complaints.includes("insomnia")) {
+            fokus.push("mengatasi sulit tidur");
+          }
+          if (complaints.includes("relaxBonding")) {
+            fokus.push("relaksasi mendalam & bonding dengan janin");
+          }
 
           const fokusText =
             fokus.length > 0
-              ? `dengan fokus: ${fokus.join(", ")}`
-              : "relaksasi umum & persiapan persalinan";
+              ? `(khusus atasi ${fokus.join(", ")})`
+              : "(relaksasi umum & persiapan persalinan gentle)";
+
           recs.push(`Pregnancy Massage ${fokusText}`);
 
-          if (complaints.length >= 2)
-            recs.push(
-              "Saran tambahan: Totok Wajah & Masker Wajah untuk relaksasi ekstra"
-            );
+          if (
+            ans.pregnantAdditional &&
+            !ans.pregnantAdditional.includes("none")
+          ) {
+            if (ans.pregnantAdditional.includes("totokScrub")) {
+              recs.push(
+                "Totok Wajah & Body Scrub (relaksasi wajah & kulit cerah)"
+              );
+            }
+          }
         } else if (ans.receiver === "postpartum") {
-          let main = "Postpartum Massage untuk pemulihan pasca melahirkan";
-          let fokus = [];
           const complaints = ans.momComplaints || [];
+          let hasBodyIssue =
+            complaints.includes("bodyPain") ||
+            complaints.includes("swollenLegs");
+
+          if (hasBodyIssue || complaints.length === 0) {
+            let bodyFokus = [];
+            if (complaints.includes("bodyPain"))
+              bodyFokus.push("nyeri punggung & badan pegal");
+            if (complaints.includes("swollenLegs"))
+              bodyFokus.push("kaki bengkak");
+            const bodyText =
+              bodyFokus.length > 0
+                ? `(fokus ${bodyFokus.join(", ")})`
+                : "(pemulihan pasca melahirkan umum)";
+            recs.push(`Postpartum Massage ${bodyText}`);
+          }
 
           if (
             complaints.includes("lowMilk") ||
             complaints.includes("swollenBreast")
           ) {
-            fokus.push(
-              "dukung ASI & atasi payudara bengkak (Lactation Massage wajib)"
+            recs.push(
+              "Lactation Massage (lancar ASI & atasi payudara bengkak/k keras)"
             );
           }
-          if (complaints.includes("bodyPain"))
-            fokus.push("pegal badan & nyeri punggung");
-          if (complaints.includes("swollenLegs")) fokus.push("kaki bengkak");
-          if (complaints.includes("dullFace"))
-            fokus.push("wajah cerah & relaksasi (Totok Wajah)");
 
-          if (fokus.length > 0) main += ` dengan fokus: ${fokus.join(", ")}`;
-          recs.push(main);
+          if (complaints.includes("dullFace")) {
+            recs.push(
+              "Totok Wajah & Masker Wajah (wajah cerah, segar & relaksasi mendalam)"
+            );
+          }
 
-          if (complaints.length >= 2);
+          if (ans.momAdditional && !ans.momAdditional.includes("none")) {
+            if (
+              ans.momAdditional.includes("totokMasker") &&
+              !complaints.includes("dullFace")
+            ) {
+              recs.push("Totok Wajah & Masker Wajah");
+            }
+            if (ans.momAdditional.includes("bodyScrub")) {
+              recs.push("Body Scrub (kulit halus & detox pasca melahirkan)");
+            }
+          }
+
+          if (complaints.length >= 2) {
+            notes.push(
+              "✅ Keluhan multiple → saran kombinasi treatment dalam 1 kunjungan untuk hasil optimal."
+            );
+          }
         } else if (ans.receiver === "baby") {
           const complaints = ans.babyComplaints || [];
           let fokus = [];
-
           if (
             complaints.includes("colic") ||
             complaints.includes("constipation")
           )
-            fokus.push("perut kembung/susah BAB");
+            fokus.push("perut kembung & susah BAB");
           if (complaints.includes("cold")) fokus.push("batuk pilek ringan");
-          if (complaints.includes("sleep")) fokus.push("sulit tidur");
-          if (complaints.includes("appetite")) fokus.push("nafsu makan");
+          if (complaints.includes("sleep")) fokus.push("sulit tidur & rewel");
+          if (complaints.includes("appetite"))
+            fokus.push("nafsu makan menurun");
 
-          if (complaints.includes("none") || ans.babyCondition === "healthy") {
-            recs.push(
-              "Baby Massage + Baby Spa (rutin untuk stimulasi tumbuh kembang)"
-            );
-          } else {
-            const fokusText =
-              fokus.length > 0
-                ? `dengan fokus: ${fokus.join(", ")}`
-                : "relaksasi umum";
-            recs.push(`Pediatric Medical Massage
-For Baby ${fokusText}`);
+          const fokusText =
+            fokus.length > 0
+              ? `(khusus atasi ${fokus.join(", ")})`
+              : "(rutin untuk stimulasi tumbuh kembang & relaksasi)";
+
+          recs.push(`Baby Massage + Baby Spa ${fokusText}`);
+
+          if (ans.babyAdditional && !ans.babyAdditional.includes("none")) {
+            if (ans.babyAdditional.includes("earPiercing"))
+              recs.push("Tindik Telinga");
+            if (ans.babyAdditional.includes("haircut"))
+              recs.push("Cukur Rambut (Hair Cut)");
+            if (ans.babyAdditional.includes("bubble"))
+              recs.push("Bubble Bath (relaksasi air hangat)");
+            if (ans.babyAdditional.includes("mask"))
+              recs.push("Body Mask (kulit bayi lembut)");
           }
-
-          if (ans.babyAdditional?.includes("earPiercing"))
-            recs.push("Tindik Telinga Bayi");
-          if (ans.babyAdditional?.includes("haircut"))
-            recs.push("Cukur Rambut Bayi");
         } else if (ans.receiver === "child") {
-          let text = "Pediatric Medical Massage (Kids Treatment)";
-          if (ans.childCondition === "unwell")
-            text += " dengan fokus pemulihan ringan";
-          recs.push(text);
+          const complaints = ans.childComplaints || [];
+          let fokus = [];
+          if (complaints.includes("cold")) fokus.push("batuk pilek ringan");
+          if (complaints.includes("sleep"))
+            fokus.push("sulit tidur & rewel malam");
+          if (complaints.includes("constipation")) fokus.push("susah BAB");
+          if (complaints.includes("appetite"))
+            fokus.push("nafsu makan menurun");
+          if (complaints.includes("hyper"))
+            fokus.push("hiperaktif & sulit fokus");
+          if (complaints.includes("tired")) fokus.push("mudah lelah");
 
-          if (ans.childAdditional?.includes("earPiercing"))
-            recs.push("Tindik Telinga Anak");
-          if (ans.childAdditional?.includes("haircut"))
-            recs.push("Cukur Rambut Anak");
-          recs.push("Opsional: Bubble Bath & Body Mask");
+          const fokusText =
+            fokus.length > 0
+              ? `(khusus atasi ${fokus.join(", ")})`
+              : "(rutin untuk relaksasi, stimulasi & kesehatan anak)";
+
+          recs.push(`Pediatric Medical Massage ${fokusText}`);
+
+          if (ans.childAdditional && !ans.childAdditional.includes("none")) {
+            if (ans.childAdditional.includes("earPiercing"))
+              recs.push("Tindik Telinga");
+            if (ans.childAdditional.includes("haircut"))
+              recs.push("Cukur Rambut (Hair Cut)");
+            if (ans.childAdditional.includes("bubble"))
+              recs.push("Bubble Bath (spa menyenangkan)");
+            if (ans.childAdditional.includes("mask"))
+              recs.push("Body Mask (kulit sehat & lembut)");
+          }
         }
 
-        return { recs, notes };
+        return { recs: [...new Set(recs)], notes };
       }
 
       function copySummary() {
@@ -618,7 +706,6 @@ For Baby ${fokusText}`);
         </ul>`
             : ""
         }
-        
       </div>`;
 
         let currentSection = "";
@@ -671,7 +758,7 @@ For Baby ${fokusText}`);
           if (current.optional) return true;
           if (!answers[current.id]) return false;
           if (current.type === "multiple")
-            return answers[current.id]?.length > 0;
+            return (answers[current.id] || []).length > 0;
           if (current.type === "single") return true;
           if (
             current.type === "text" ||
@@ -771,7 +858,7 @@ For Baby ${fokusText}`);
       ${noteHtml}
       ${
         current.type === "multiple"
-          ? '<small class="text-muted d-block mb-3">Pilih satu atau lebih</small>'
+          ? '<small class="text-muted d-block mb-3">Pilih satu atau lebih (bisa pilih "Tidak ada" jika tidak ingin tambahan)</small>'
           : ""
       }
       ${optionsHtml}
