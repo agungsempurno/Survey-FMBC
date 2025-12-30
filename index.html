@@ -206,6 +206,10 @@
           showIf: (ans) => ans.receiver === "pregnant",
           options: [
             { value: "totokScrub", label: "Totok Wajah & Body Scrub" },
+            { value: "bloodSugar", label: "Pemeriksaan Gula Darah" },
+            { value: "cholesterol", label: "Pemeriksaan Kolesterol" },
+            { value: "uricAcid", label: "Pemeriksaan Asam Urat" },
+            { value: "breastMask", label: "Masker Payudara" },
             { value: "none", label: "Tidak ada" },
           ],
         },
@@ -271,6 +275,10 @@
           options: [
             { value: "totokMasker", label: "Totok Wajah & Masker Wajah" },
             { value: "bodyScrub", label: "Body Scrub" },
+            { value: "bloodSugar", label: "Pemeriksaan Gula Darah" },
+            { value: "cholesterol", label: "Pemeriksaan Kolesterol" },
+            { value: "uricAcid", label: "Pemeriksaan Asam Urat" },
+            { value: "breastMask", label: "Masker Payudara" },
             { value: "none", label: "Tidak ada" },
           ],
         },
@@ -456,35 +464,6 @@
 
       function getRecommendations(ans) {
         const recs = [];
-        const notes = [];
-
-        if (ans.fever === "yes") {
-          if (
-            ans.receiver === "postpartum" &&
-            (ans.momComplaints?.includes("swollenBreast") ||
-              ans.momComplaints?.includes("lowMilk"))
-          ) {
-            notes.push(
-              "✅ Lactation Massage tetap bisa dilakukan meski demam ringan (untuk keluhan payudara/ASI)."
-            );
-          } else {
-            notes.push(
-              "⚠️ Treatment pijat sebaiknya ditunda hingga demam reda."
-            );
-          }
-        }
-
-        if (ans.allergy === "yes") {
-          notes.push(
-            "⚠️ Informasikan detail alergi ke therapist untuk penyesuaian bahan."
-          );
-        }
-
-        if (ans.generalCondition === "complaint" || ans.complaintDetail) {
-          notes.push(
-            "⚠️ Keluhan tambahan akan dibahas langsung dengan therapist."
-          );
-        }
 
         if (ans.receiver === "pregnant") {
           const complaints = ans.pregnantComplaints || [];
@@ -512,6 +491,10 @@
 
           recs.push(`Pregnancy Massage ${fokusText}`);
 
+          if (complaints.includes("swollenLegs")) {
+            recs.push("Foot Spa (mengurangi bengkak & kram pada kaki)");
+          }
+
           if (
             ans.pregnantAdditional &&
             !ans.pregnantAdditional.includes("none")
@@ -520,6 +503,18 @@
               recs.push(
                 "Totok Wajah & Body Scrub (relaksasi wajah & kulit cerah)"
               );
+            }
+            if (ans.pregnantAdditional.includes("bloodSugar")) {
+              recs.push("Pemeriksaan Gula Darah");
+            }
+            if (ans.pregnantAdditional.includes("cholesterol")) {
+              recs.push("Pemeriksaan Kolesterol");
+            }
+            if (ans.pregnantAdditional.includes("uricAcid")) {
+              recs.push("Pemeriksaan Asam Urat");
+            }
+            if (ans.pregnantAdditional.includes("breastMask")) {
+              recs.push("Masker Payudara");
             }
           }
         } else if (ans.receiver === "postpartum") {
@@ -541,13 +536,15 @@
             recs.push(`Postpartum Massage ${bodyText}`);
           }
 
+          if (complaints.includes("swollenLegs")) {
+            recs.push("Foot Spa (mengurangi bengkak pada kaki)");
+          }
+
           if (
             complaints.includes("lowMilk") ||
             complaints.includes("swollenBreast")
           ) {
-            recs.push(
-              "Lactation Massage (lancar ASI & atasi payudara bengkak/k keras)"
-            );
+            recs.push("Lactation Massage (1 Hari - 24 Bulan Pasca Persalinan)");
           }
 
           if (complaints.includes("dullFace")) {
@@ -566,12 +563,18 @@
             if (ans.momAdditional.includes("bodyScrub")) {
               recs.push("Body Scrub (kulit halus & detox pasca melahirkan)");
             }
-          }
-
-          if (complaints.length >= 2) {
-            notes.push(
-              "✅ Keluhan multiple → saran kombinasi treatment dalam 1 kunjungan untuk hasil optimal."
-            );
+            if (ans.momAdditional.includes("bloodSugar")) {
+              recs.push("Pemeriksaan Gula Darah");
+            }
+            if (ans.momAdditional.includes("cholesterol")) {
+              recs.push("Pemeriksaan Kolesterol");
+            }
+            if (ans.momAdditional.includes("uricAcid")) {
+              recs.push("Pemeriksaan Asam Urat");
+            }
+            if (ans.momAdditional.includes("breastMask")) {
+              recs.push("Masker Payudara");
+            }
           }
         } else if (ans.receiver === "baby") {
           const complaints = ans.babyComplaints || [];
@@ -612,8 +615,6 @@
           if (complaints.includes("constipation")) fokus.push("susah BAB");
           if (complaints.includes("appetite"))
             fokus.push("nafsu makan menurun");
-          if (complaints.includes("hyper"))
-            fokus.push("hiperaktif & sulit fokus");
           if (complaints.includes("tired")) fokus.push("mudah lelah");
 
           const fokusText =
@@ -626,8 +627,6 @@
           if (ans.childAdditional && !ans.childAdditional.includes("none")) {
             if (ans.childAdditional.includes("earPiercing"))
               recs.push("Tindik Telinga");
-            if (ans.childAdditional.includes("haircut"))
-              recs.push("Cukur Rambut (Hair Cut)");
             if (ans.childAdditional.includes("bubble"))
               recs.push("Bubble Bath (spa menyenangkan)");
             if (ans.childAdditional.includes("mask"))
@@ -635,7 +634,7 @@
           }
         }
 
-        return { recs: [...new Set(recs)], notes };
+        return { recs: [...new Set(recs)] };
       }
 
       function copySummary() {
@@ -657,13 +656,9 @@
           text += displayValue + "\n\n";
         });
 
-        const { recs, notes } = getRecommendations(answers);
+        const { recs } = getRecommendations(answers);
         text += "REKOMENDASI TREATMENT\n";
         text += recs.join("\n") + "\n";
-        if (notes.length > 0) {
-          text += "\nCATATAN PENTING\n";
-          text += notes.join("\n") + "\n";
-        }
 
         navigator.clipboard
           .writeText(text)
@@ -676,7 +671,7 @@
       }
 
       function renderSummary() {
-        const { recs, notes } = getRecommendations(answers);
+        const { recs } = getRecommendations(answers);
 
         let html = `
       <div class="text-center mb-5">
@@ -696,16 +691,6 @@
         <ul class="mb-3">
           ${recs.map((r) => `<li><strong>${r}</strong></li>`).join("")}
         </ul>
-        ${
-          notes.length > 0
-            ? `
-        <hr>
-        <h6>Catatan penting:</h6>
-        <ul>
-          ${notes.map((n) => `<li>${n}</li>`).join("")}
-        </ul>`
-            : ""
-        }
       </div>`;
 
         let currentSection = "";
@@ -777,11 +762,24 @@
           sectionHtml = `<div class="section-title">${current.section}</div>`;
         }
 
+        // Khusus untuk therapist: filter opsi jika ibu hamil
+        let effectiveOptions = current.options || [];
+        let extraNote = "";
+        if (current.id === "therapist" && answers.receiver === "pregnant") {
+          effectiveOptions = current.options.filter(
+            (opt) => opt.value !== "professional"
+          );
+          extraNote = `<div class="note mb-4">Untuk ibu hamil, treatment hanya dilakukan oleh therapist bidan terlatih.</div>`;
+          if (answers.therapist === "professional") {
+            answers.therapist = undefined;
+          }
+        }
+
         let optionsHtml = "";
-        if (current.options) {
+        if (effectiveOptions.length > 0) {
           const inputType = current.type === "multiple" ? "checkbox" : "radio";
           const name = current.id;
-          optionsHtml = current.options
+          optionsHtml = effectiveOptions
             .map((opt) => {
               const selected =
                 current.type === "multiple"
@@ -827,13 +825,13 @@
           let noteText = "";
           if (receiver === "pregnant") {
             noteText =
-              "Demam pada ibu hamil: disarankan menunda hingga stabil.";
+              "Demam pada ibu hamil: disarankan menunda hingga suhu tubuh normal (36,5 - 37,5 derajat celcius).";
           } else if (receiver === "postpartum") {
             noteText =
               "Lactation Massage tetap bisa untuk keluhan payudara meski demam ringan.";
           } else if (receiver === "baby" || receiver === "child") {
             noteText =
-              "Demam pada bayi/anak: treatment ditunda hingga suhu normal.";
+              "Demam pada bayi/anak: treatment ditunda hingga suhu tubuh normal (36,5 - 37,5 derajat celcius).";
           }
           if (noteText) {
             noteHtml = `<div class="note mb-4">${noteText}</div>`;
@@ -855,6 +853,7 @@
         </div>
       </div>
       <h4 class="mb-4">${current.question}</h4>
+      ${extraNote}
       ${noteHtml}
       ${
         current.type === "multiple"
