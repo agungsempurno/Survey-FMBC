@@ -186,10 +186,7 @@
             { value: "swollenLegs", label: "Kaki bengkak / kram" },
             { value: "insomnia", label: "Sulit tidur" },
             { value: "shoulderPain", label: "Nyeri di bahu / leher" },
-            {
-              value: "relaxBonding",
-              label: "Ingin relaksasi dan bonding dengan janin",
-            },
+
             { value: "other", label: "Lainnya" },
           ],
         },
@@ -474,9 +471,7 @@
           ) {
             fokus.push("nyeri punggung, pinggang, bahu & leher");
           }
-          if (complaints.includes("swollenLegs")) {
-            fokus.push("kaki bengkak & kram");
-          }
+          // Dihapus: kaki bengkak & kram dari fokus Pregnancy Massage
           if (complaints.includes("insomnia")) {
             fokus.push("mengatasi sulit tidur");
           }
@@ -491,6 +486,7 @@
 
           recs.push(`Pregnancy Massage ${fokusText}`);
 
+          // Foot Spa tetap direkomendasikan terpisah jika ada keluhan kaki bengkak
           if (complaints.includes("swollenLegs")) {
             recs.push("Foot Spa (mengurangi bengkak & kram pada kaki)");
           }
@@ -527,8 +523,7 @@
             let bodyFokus = [];
             if (complaints.includes("bodyPain"))
               bodyFokus.push("nyeri punggung & badan pegal");
-            if (complaints.includes("swollenLegs"))
-              bodyFokus.push("kaki bengkak");
+            // Dihapus: kaki bengkak dari fokus Postpartum Massage
             const bodyText =
               bodyFokus.length > 0
                 ? `(fokus ${bodyFokus.join(", ")})`
@@ -536,6 +531,7 @@
             recs.push(`Postpartum Massage ${bodyText}`);
           }
 
+          // Foot Spa tetap direkomendasikan terpisah
           if (complaints.includes("swollenLegs")) {
             recs.push("Foot Spa (mengurangi bengkak pada kaki)");
           }
