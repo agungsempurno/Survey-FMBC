@@ -186,7 +186,18 @@
             { value: "swollenLegs", label: "Kaki bengkak / kram" },
             { value: "insomnia", label: "Sulit tidur" },
             { value: "shoulderPain", label: "Nyeri di bahu / leher" },
-
+            {
+              value: "anxiousBirth",
+              label: "Cemas menghadapi persalinan / kurang persiapan",
+            },
+            {
+              value: "lackKnowledge",
+              label: "Kurang pengetahuan parenting & perawatan bayi",
+            },
+            {
+              value: "wantExercise",
+              label: "Ingin senam hamil untuk kebugaran & persiapan persalinan",
+            },
             { value: "other", label: "Lainnya" },
           ],
         },
@@ -471,12 +482,8 @@
           ) {
             fokus.push("nyeri punggung, pinggang, bahu & leher");
           }
-          // Dihapus: kaki bengkak & kram dari fokus Pregnancy Massage
           if (complaints.includes("insomnia")) {
             fokus.push("mengatasi sulit tidur");
-          }
-          if (complaints.includes("relaxBonding")) {
-            fokus.push("relaksasi mendalam & bonding dengan janin");
           }
 
           const fokusText =
@@ -486,9 +493,27 @@
 
           recs.push(`Pregnancy Massage ${fokusText}`);
 
-          // Foot Spa tetap direkomendasikan terpisah jika ada keluhan kaki bengkak
           if (complaints.includes("swollenLegs")) {
             recs.push("Foot Spa (mengurangi bengkak & kram pada kaki)");
+          }
+
+          // Rekomendasi kelas edukasi & senam berdasarkan keluhan baru
+          if (complaints.includes("anxiousBirth")) {
+            recs.push("Birthing Essentials Private Class");
+          }
+          if (complaints.includes("lackKnowledge")) {
+            recs.push("Beginner Parenting Private Course");
+          }
+          if (
+            complaints.includes("anxiousBirth") &&
+            complaints.includes("lackKnowledge")
+          ) {
+            recs.push(
+              "Comprehensive Course (paket lengkap birthing & parenting)"
+            );
+          }
+          if (complaints.includes("wantExercise")) {
+            recs.push("Kelas Senam Hamil (27-41 Minggu)");
           }
 
           if (
@@ -523,7 +548,6 @@
             let bodyFokus = [];
             if (complaints.includes("bodyPain"))
               bodyFokus.push("nyeri punggung & badan pegal");
-            // Dihapus: kaki bengkak dari fokus Postpartum Massage
             const bodyText =
               bodyFokus.length > 0
                 ? `(fokus ${bodyFokus.join(", ")})`
@@ -531,7 +555,6 @@
             recs.push(`Postpartum Massage ${bodyText}`);
           }
 
-          // Foot Spa tetap direkomendasikan terpisah
           if (complaints.includes("swollenLegs")) {
             recs.push("Foot Spa (mengurangi bengkak pada kaki)");
           }
@@ -758,9 +781,11 @@
           sectionHtml = `<div class="section-title">${current.section}</div>`;
         }
 
-        // Khusus untuk therapist: filter opsi jika ibu hamil
+        // Default options
         let effectiveOptions = current.options || [];
         let extraNote = "";
+
+        // Filter therapist untuk ibu hamil
         if (current.id === "therapist" && answers.receiver === "pregnant") {
           effectiveOptions = current.options.filter(
             (opt) => opt.value !== "professional"
@@ -768,6 +793,23 @@
           extraNote = `<div class="note mb-4">Untuk ibu hamil, treatment hanya dilakukan oleh therapist bidan terlatih.</div>`;
           if (answers.therapist === "professional") {
             answers.therapist = undefined;
+          }
+        }
+
+        // Filter Bubble Bath untuk bayi jika homecare
+        if (current.id === "babyAdditional" && answers.location === "home") {
+          effectiveOptions = current.options.filter(
+            (opt) => opt.value !== "bubble"
+          );
+          extraNote = `<div class="note mb-4">Bubble Bath hanya tersedia di klinik (tidak untuk homecare).</div>`;
+          // Hapus bubble dari jawaban jika sebelumnya dipilih (jika user ganti lokasi ke home)
+          if (
+            answers.babyAdditional &&
+            answers.babyAdditional.includes("bubble")
+          ) {
+            answers.babyAdditional = answers.babyAdditional.filter(
+              (v) => v !== "bubble"
+            );
           }
         }
 
