@@ -90,24 +90,6 @@
           ],
         },
         {
-          id: "location",
-          question: "Lokasi perawatan:",
-          type: "single",
-          options: [
-            { value: "clinic", label: "Klinik Farah Mom & Baby Care" },
-            { value: "home", label: "Homecare (di rumah)" },
-          ],
-        },
-        {
-          id: "firstVisit",
-          question: "Apakah ini layanan pertama dari Farah Mom & Baby Care?",
-          type: "single",
-          options: [
-            { value: "yes", label: "Ya" },
-            { value: "no", label: "Tidak" },
-          ],
-        },
-        {
           id: "generalCondition",
           section: "KONDISI UMUM",
           question: "Kondisi umum penerima treatment saat ini:",
@@ -128,56 +110,8 @@
           showIf: (ans) => ans.generalCondition === "complaint",
         },
         {
-          id: "medication",
-          question: "Apakah sedang mengonsumsi obat atau suplemen tertentu?",
-          type: "single",
-          options: [
-            { value: "yes", label: "Ya" },
-            { value: "no", label: "Tidak" },
-          ],
-        },
-        {
-          id: "medicationDetail",
-          question: "Sebutkan obat/suplemen:",
-          type: "textarea",
-          showIf: (ans) => ans.medication === "yes",
-        },
-        {
-          id: "allergy",
-          question:
-            "Apakah memiliki alergi terhadap minyak pijat, essential oil, atau bahan herbal tertentu?",
-          type: "single",
-          options: [
-            { value: "yes", label: "Ya" },
-            { value: "no", label: "Tidak" },
-          ],
-        },
-        {
-          id: "allergyDetail",
-          question: "Jelaskan alergi:",
-          type: "textarea",
-          showIf: (ans) => ans.allergy === "yes",
-        },
-        {
-          id: "fever",
-          question:
-            "Apakah sedang mengalami demam (suhu tubuh di atas 37,5°C)?",
-          type: "single",
-          options: [
-            { value: "yes", label: "Ya" },
-            { value: "no", label: "Tidak" },
-          ],
-        },
-        {
-          id: "pregnantWeek",
-          section: "IBU HAMIL",
-          question: "Usia kehamilan saat ini:",
-          type: "text",
-          showIf: (ans) => ans.receiver === "pregnant",
-          placeholder: "contoh: “28 minggu” atau '3 bulan'",
-        },
-        {
           id: "pregnantComplaints",
+          section: "IBU HAMIL",
           question: "Keluhan yang dirasakan:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "pregnant",
@@ -185,7 +119,6 @@
             { value: "backPain", label: "Pegal punggung / pinggang" },
             { value: "swollenLegs", label: "Kaki bengkak / kram" },
             { value: "insomnia", label: "Sulit tidur" },
-            { value: "shoulderPain", label: "Nyeri di bahu / leher" },
             {
               value: "anxiousBirth",
               label: "Cemas menghadapi persalinan / kurang persiapan",
@@ -222,40 +155,19 @@
           ],
         },
         {
-          id: "momDuration",
-          section: "IBU PASCA MELAHIRKAN / MENYUSUI",
-          question: "Sudah berapa lama pasca melahirkan?",
+          id: "pregnantWeek",
+          question: "Usia kehamilan saat ini:",
           type: "text",
-          showIf: (ans) => ans.receiver === "postpartum",
-          placeholder: "contoh: “3 minggu” atau “4 bulan”",
-        },
-        {
-          id: "birthType",
-          question: "Jenis persalinan:",
-          type: "single",
-          showIf: (ans) => ans.receiver === "postpartum",
-          options: [
-            { value: "normal", label: "Pervaginam/Normal" },
-            { value: "caesar", label: "Section Caesarea (SC)" },
-          ],
-        },
-        {
-          id: "activeBF",
-          question: "Apakah sedang menyusui aktif?",
-          type: "single",
-          showIf: (ans) => ans.receiver === "postpartum",
-          options: [
-            { value: "yes", label: "Ya" },
-            { value: "no", label: "Tidak" },
-          ],
+          showIf: (ans) => ans.receiver === "pregnant",
+          placeholder: "contoh: “28 minggu” atau '3 bulan'",
         },
         {
           id: "momComplaints",
+          section: "IBU PASCA MELAHIRKAN / MENYUSUI",
           question: "Keluhan utama:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "postpartum",
           options: [
-            { value: "bodyPain", label: "Badan pegal / nyeri punggung" },
             { value: "lowMilk", label: "Produksi ASI menurun" },
             {
               value: "swollenBreast",
@@ -291,25 +203,35 @@
           ],
         },
         {
-          id: "babyAge",
-          section: "BAYI (0–12 BULAN)",
-          question: "Usia bayi:",
+          id: "momDuration",
+          question: "Sudah berapa lama pasca melahirkan?",
           type: "text",
-          showIf: (ans) => ans.receiver === "baby",
-          placeholder: "contoh: “3 bulan”",
+          showIf: (ans) => ans.receiver === "postpartum",
+          placeholder: "contoh: “3 minggu” atau “4 bulan”",
         },
         {
-          id: "babyCondition",
-          question: "Kondisi bayi saat ini:",
+          id: "birthType",
+          question: "Jenis persalinan:",
           type: "single",
-          showIf: (ans) => ans.receiver === "baby",
+          showIf: (ans) => ans.receiver === "postpartum",
           options: [
-            { value: "healthy", label: "Sehat & ceria" },
-            { value: "unwell", label: "Kurang sehat / rewel" },
+            { value: "normal", label: "Pervaginam/Normal" },
+            { value: "caesar", label: "Section Caesarea (SC)" },
+          ],
+        },
+        {
+          id: "activeBF",
+          question: "Apakah sedang menyusui aktif?",
+          type: "single",
+          showIf: (ans) => ans.receiver === "postpartum",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
           ],
         },
         {
           id: "babyComplaints",
+          section: "BAYI (0–12 BULAN)",
           question: "Keluhan bayi:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "baby",
@@ -334,21 +256,35 @@
           options: [
             { value: "earPiercing", label: "Tindik Telinga" },
             { value: "haircut", label: "Cukur Rambut Botak/Gundul (Hair Cut)" },
-            { value: "bubble", label: "Bubble Bath" },
+            {
+              value: "bubble",
+              label:
+                "<strong>Bubble Bath (Tersedia jika bunda memilih di Klinik)",
+            },
             { value: "mask", label: "Body Mask" },
             { value: "none", label: "Tidak ada" },
           ],
         },
         {
-          id: "childAge",
-          section: "ANAK (1–10 TAHUN)",
-          question: "Usia anak:",
+          id: "babyAge",
+          question: "Usia bayi:",
           type: "text",
-          showIf: (ans) => ans.receiver === "child",
-          placeholder: "contoh: “6 tahun”",
+          showIf: (ans) => ans.receiver === "baby",
+          placeholder: "contoh: “3 bulan”",
+        },
+        {
+          id: "babyCondition",
+          question: "Kondisi bayi saat ini:",
+          type: "single",
+          showIf: (ans) => ans.receiver === "baby",
+          options: [
+            { value: "healthy", label: "Sehat & ceria" },
+            { value: "unwell", label: "Kurang sehat / rewel" },
+          ],
         },
         {
           id: "childComplaints",
+          section: "ANAK (1–10 TAHUN)",
           question: "Keluhan anak:",
           type: "multiple",
           showIf: (ans) => ans.receiver === "child",
@@ -377,8 +313,109 @@
           ],
         },
         {
-          id: "therapist",
+          id: "childAge",
+          question: "Usia anak:",
+          type: "text",
+          showIf: (ans) => ans.receiver === "child",
+          placeholder: "contoh: “6 tahun”",
+        },
+        // === KONDISI KESEHATAN LAIN: medication, allergy, fever ===
+        {
+          id: "medication",
+          question: "Apakah sedang mengonsumsi obat atau suplemen tertentu?",
+          type: "single",
+          showIf: (ans) => {
+            if (ans.receiver !== "pregnant") return true;
+            const complaints = ans.pregnantComplaints || [];
+            const physicalComplaints = [
+              "backPain",
+              "swollenLegs",
+              "insomnia",
+              "other",
+            ];
+            return complaints.some((c) => physicalComplaints.includes(c));
+          },
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "medicationDetail",
+          question: "Sebutkan obat/suplemen:",
+          type: "textarea",
+          showIf: (ans) => ans.medication === "yes",
+        },
+        {
+          id: "allergy",
+          question:
+            "Apakah memiliki alergi terhadap minyak pijat, essential oil, atau bahan herbal tertentu?",
+          type: "single",
+          showIf: (ans) => {
+            if (ans.receiver !== "pregnant") return true;
+            const complaints = ans.pregnantComplaints || [];
+            const physicalComplaints = [
+              "backPain",
+              "swollenLegs",
+              "insomnia",
+              "other",
+            ];
+            return complaints.some((c) => physicalComplaints.includes(c));
+          },
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "allergyDetail",
+          question: "Jelaskan alergi:",
+          type: "textarea",
+          showIf: (ans) => ans.allergy === "yes",
+        },
+        {
+          id: "fever",
+          question:
+            "Apakah sedang mengalami demam (suhu tubuh di atas 37,5°C)?",
+          type: "single",
+          showIf: (ans) => {
+            if (ans.receiver !== "pregnant") return true;
+            const complaints = ans.pregnantComplaints || [];
+            const physicalComplaints = [
+              "backPain",
+              "swollenLegs",
+              "insomnia",
+              "other",
+            ];
+            return complaints.some((c) => physicalComplaints.includes(c));
+          },
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        // === PENJADWALAN ===
+        {
+          id: "firstVisit",
           section: "PREFERENSI & PENJADWALAN",
+          question: "Apakah ini layanan pertama dari Farah Mom & Baby Care?",
+          type: "single",
+          options: [
+            { value: "yes", label: "Ya" },
+            { value: "no", label: "Tidak" },
+          ],
+        },
+        {
+          id: "location",
+          question: "Lokasi perawatan:",
+          type: "single",
+          options: [
+            { value: "clinic", label: "Klinik Farah Mom & Baby Care" },
+            { value: "home", label: "Homecare (di rumah)" },
+          ],
+        },
+        {
+          id: "therapist",
           question: "Pilih therapist:",
           type: "single",
           options: [
@@ -476,11 +513,8 @@
         if (ans.receiver === "pregnant") {
           const complaints = ans.pregnantComplaints || [];
           let fokus = [];
-          if (
-            complaints.includes("backPain") ||
-            complaints.includes("shoulderPain")
-          ) {
-            fokus.push("nyeri punggung, pinggang, bahu & leher");
+          if (complaints.includes("backPain")) {
+            fokus.push("nyeri punggung & pinggang");
           }
           if (complaints.includes("insomnia")) {
             fokus.push("mengatasi sulit tidur");
@@ -491,13 +525,19 @@
               ? `(khusus atasi ${fokus.join(", ")})`
               : "(relaksasi umum & persiapan persalinan gentle)";
 
-          recs.push(`Pregnancy Massage ${fokusText}`);
+          // Hanya tambahkan Pregnancy Massage jika ada keluhan fisik
+          if (
+            fokus.length > 0 ||
+            complaints.includes("swollenLegs") ||
+            complaints.includes("other")
+          ) {
+            recs.push(`Pregnancy Massage ${fokusText}`);
+          }
 
           if (complaints.includes("swollenLegs")) {
             recs.push("Foot Spa (mengurangi bengkak & kram pada kaki)");
           }
 
-          // Rekomendasi kelas edukasi & senam berdasarkan keluhan baru
           if (complaints.includes("anxiousBirth")) {
             recs.push("Birthing Essentials Private Class");
           }
@@ -781,11 +821,9 @@
           sectionHtml = `<div class="section-title">${current.section}</div>`;
         }
 
-        // Default options
         let effectiveOptions = current.options || [];
         let extraNote = "";
 
-        // Filter therapist untuk ibu hamil
         if (current.id === "therapist" && answers.receiver === "pregnant") {
           effectiveOptions = current.options.filter(
             (opt) => opt.value !== "professional"
@@ -796,13 +834,11 @@
           }
         }
 
-        // Filter Bubble Bath untuk bayi jika homecare
         if (current.id === "babyAdditional" && answers.location === "home") {
           effectiveOptions = current.options.filter(
             (opt) => opt.value !== "bubble"
           );
           extraNote = `<div class="note mb-4">Bubble Bath hanya tersedia di klinik (tidak untuk homecare).</div>`;
-          // Hapus bubble dari jawaban jika sebelumnya dipilih (jika user ganti lokasi ke home)
           if (
             answers.babyAdditional &&
             answers.babyAdditional.includes("bubble")
