@@ -109,7 +109,6 @@
           type: "textarea",
           showIf: (ans) => ans.generalCondition === "complaint",
         },
-        // DIPINDAHKAN KE SINI: Lokasi perawatan sekarang muncul sebelum keluhan spesifik
         {
           id: "location",
           question: "Lokasi perawatan:",
@@ -314,7 +313,11 @@
           showIf: (ans) => ans.receiver === "child",
           options: [
             { value: "earPiercing", label: "Tindik Telinga" },
-            { value: "bubble", label: "Bubble Bath" },
+            {
+              value: "bubble",
+              label:
+                "<strong>Bubble Bath (Tersedia jika bunda memilih di Klinik)",
+            },
             { value: "mask", label: "Body Mask" },
             { value: "none", label: "Tidak ada" },
           ],
@@ -326,7 +329,6 @@
           showIf: (ans) => ans.receiver === "child",
           placeholder: "contoh: “6 tahun”",
         },
-        // === KONDISI KESEHATAN LAIN ===
         {
           id: "medication",
           question: "Apakah sedang mengonsumsi obat atau suplemen tertentu?",
@@ -401,7 +403,6 @@
             { value: "no", label: "Tidak" },
           ],
         },
-        // === PENJADWALAN (sisa pertanyaan) ===
         {
           id: "firstVisit",
           section: "PREFERENSI & PENJADWALAN",
@@ -831,6 +832,7 @@
           }
         }
 
+        // Filter Bubble Bath untuk bayi jika homecare
         if (current.id === "babyAdditional" && answers.location === "home") {
           effectiveOptions = current.options.filter(
             (opt) => opt.value !== "bubble",
@@ -841,6 +843,22 @@
             answers.babyAdditional.includes("bubble")
           ) {
             answers.babyAdditional = answers.babyAdditional.filter(
+              (v) => v !== "bubble",
+            );
+          }
+        }
+
+        // Filter Bubble Bath untuk anak jika homecare (BARU DITAMBAHKAN)
+        if (current.id === "childAdditional" && answers.location === "home") {
+          effectiveOptions = current.options.filter(
+            (opt) => opt.value !== "bubble",
+          );
+          extraNote = `<div class="note mb-4">Bubble Bath hanya tersedia di klinik (tidak untuk homecare).</div>`;
+          if (
+            answers.childAdditional &&
+            answers.childAdditional.includes("bubble")
+          ) {
+            answers.childAdditional = answers.childAdditional.filter(
               (v) => v !== "bubble",
             );
           }
