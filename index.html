@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
@@ -108,6 +108,16 @@
           question: "Jelaskan keluhan tertentu:",
           type: "textarea",
           showIf: (ans) => ans.generalCondition === "complaint",
+        },
+        // DIPINDAHKAN KE SINI: Lokasi perawatan sekarang muncul sebelum keluhan spesifik
+        {
+          id: "location",
+          question: "Lokasi perawatan:",
+          type: "single",
+          options: [
+            { value: "clinic", label: "Klinik Farah Mom & Baby Care" },
+            { value: "home", label: "Homecare (di rumah)" },
+          ],
         },
         {
           id: "pregnantComplaints",
@@ -316,7 +326,7 @@
           showIf: (ans) => ans.receiver === "child",
           placeholder: "contoh: “6 tahun”",
         },
-        // === KONDISI KESEHATAN LAIN: medication, allergy, fever ===
+        // === KONDISI KESEHATAN LAIN ===
         {
           id: "medication",
           question: "Apakah sedang mengonsumsi obat atau suplemen tertentu?",
@@ -391,7 +401,7 @@
             { value: "no", label: "Tidak" },
           ],
         },
-        // === PENJADWALAN ===
+        // === PENJADWALAN (sisa pertanyaan) ===
         {
           id: "firstVisit",
           section: "PREFERENSI & PENJADWALAN",
@@ -400,15 +410,6 @@
           options: [
             { value: "yes", label: "Ya" },
             { value: "no", label: "Tidak" },
-          ],
-        },
-        {
-          id: "location",
-          question: "Lokasi perawatan:",
-          type: "single",
-          options: [
-            { value: "clinic", label: "Klinik Farah Mom & Baby Care" },
-            { value: "home", label: "Homecare (di rumah)" },
           ],
         },
         {
@@ -522,7 +523,6 @@
               ? `(khusus atasi ${fokus.join(", ")})`
               : "(relaksasi umum & persiapan persalinan gentle)";
 
-          // Hanya tambahkan Pregnancy Massage jika ada keluhan fisik
           if (
             fokus.length > 0 ||
             complaints.includes("swollenLegs") ||
@@ -546,7 +546,7 @@
             complaints.includes("lackKnowledge")
           ) {
             recs.push(
-              "Comprehensive Course (paket lengkap birthing & parenting)"
+              "Comprehensive Course (paket lengkap birthing & parenting)",
             );
           }
           if (complaints.includes("wantExercise")) {
@@ -559,7 +559,7 @@
           ) {
             if (ans.pregnantAdditional.includes("totokScrub")) {
               recs.push(
-                "Totok Wajah & Body Scrub (relaksasi wajah & kulit cerah)"
+                "Totok Wajah & Body Scrub (relaksasi wajah & kulit cerah)",
               );
             }
             if (ans.pregnantAdditional.includes("bloodSugar")) {
@@ -605,7 +605,7 @@
 
           if (complaints.includes("dullFace")) {
             recs.push(
-              "Totok Wajah & Masker Wajah (wajah cerah, segar & relaksasi mendalam)"
+              "Totok Wajah & Masker Wajah (wajah cerah, segar & relaksasi mendalam)",
             );
           }
 
@@ -823,7 +823,7 @@
 
         if (current.id === "therapist" && answers.receiver === "pregnant") {
           effectiveOptions = current.options.filter(
-            (opt) => opt.value !== "professional"
+            (opt) => opt.value !== "professional",
           );
           extraNote = `<div class="note mb-4">Untuk ibu hamil, treatment hanya dilakukan oleh therapist bidan terlatih.</div>`;
           if (answers.therapist === "professional") {
@@ -833,7 +833,7 @@
 
         if (current.id === "babyAdditional" && answers.location === "home") {
           effectiveOptions = current.options.filter(
-            (opt) => opt.value !== "bubble"
+            (opt) => opt.value !== "bubble",
           );
           extraNote = `<div class="note mb-4">Bubble Bath hanya tersedia di klinik (tidak untuk homecare).</div>`;
           if (
@@ -841,7 +841,7 @@
             answers.babyAdditional.includes("bubble")
           ) {
             answers.babyAdditional = answers.babyAdditional.filter(
-              (v) => v !== "bubble"
+              (v) => v !== "bubble",
             );
           }
         }
@@ -859,11 +859,11 @@
               return `
                 <div class="form-check">
                   <input class="form-check-input" type="${inputType}" name="${name}" id="${
-                opt.value
-              }" value="${opt.value}"
+                    opt.value
+                  }" value="${opt.value}"
                          ${selected ? "checked" : ""} onchange="handleAnswer('${
-                current.id
-              }', '${opt.value}', ${current.type === "multiple"})">
+                           current.id
+                         }', '${opt.value}', ${current.type === "multiple"})">
                   <label class="form-check-label fw-medium" for="${opt.value}">
                     ${opt.label}
                   </label>
@@ -951,7 +951,7 @@
 
         if (current.type === "text" || current.type === "textarea") {
           const input = app.querySelector(
-            "input.form-control, textarea.form-control"
+            "input.form-control, textarea.form-control",
           );
           if (input) {
             input.focus();
